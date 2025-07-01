@@ -20,7 +20,7 @@ const ApplicantsTable = () => {
             const res = await axios.post(`${APPLICATION_API_END_POINT}/status/${id}/update`, { status });
             
             if (res.data.success) {
-                // Cập nhật trạng thái trong Redux store
+                // Update status in Redux store
                 dispatch(updateApplicationStatus({ id, status: status.toLowerCase() }));
                 toast.success(res.data.message);
             }

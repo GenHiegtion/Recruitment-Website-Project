@@ -23,7 +23,7 @@ const AdminDashboard = () => {
     const { user } = useSelector(store => store.auth)
     const navigate = useNavigate()
     const [users, setUsers] = useState([])
-    const [allUsers, setAllUsers] = useState([]) // Lưu trữ tất cả người dùng
+    const [allUsers, setAllUsers] = useState([]) // Store all users
     const [loading, setLoading] = useState(false)
     const [filter, setFilter] = useState('all')
     const [search, setSearch] = useState('')
@@ -36,11 +36,11 @@ const AdminDashboard = () => {
         recruiters: 0
     })
     
-    // Thêm state cho phân trang
+    // Added state for pagination
     const [currentPage, setCurrentPage] = useState(1)
-    const usersPerPage = 5 // Số người dùng trên mỗi trang
+    const usersPerPage = 5 // Number of users per page
 
-    // Chỉ cho phép admin truy cập trang này
+    // Only allow admin to access this page
     useEffect(() => {
         if (!user) {
             navigate('/login')
@@ -50,26 +50,26 @@ const AdminDashboard = () => {
         }
     }, [user, navigate])
 
-    // Lấy danh sách tất cả người dùng
+    // Get list of all users
     const fetchUsers = async () => {
         try {
             setLoading(true)
             let url = `${USER_API_END_POINT}/all`
             
-            // Xây dựng query params
+            // Build query params
             const params = new URLSearchParams()
             
-            // Áp dụng lọc theo vai trò nếu không phải "all"
+            // Apply role filter if not "all"
             if (filter !== 'all') {
                 params.append('role', filter)
             }
             
-            // Thêm tham số tìm kiếm nếu có
+            // Add search parameter if available
             if (search.trim()) {
                 params.append('search', search.trim())
             }
             
-            // Thêm query params vào URL
+            // Add query params to URL
             const queryString = params.toString()
             if (queryString) {
                 url += `?${queryString}`
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
                 const fetchedUsers = response.data.users
                 setAllUsers(fetchedUsers)
                 
-                // Cập nhật thống kê
+                // Update statistics
                 if (filter === 'all') {
                     const stats = {
                         total: fetchedUsers.length,
@@ -92,10 +92,10 @@ const AdminDashboard = () => {
                     setUserStats(stats)
                 }
                 
-                // Reset về trang đầu tiên khi có kết quả mới
+                // Reset to first page when new results are available
                 setCurrentPage(1)
                 
-                // Hiển thị người dùng của trang đầu tiên
+                // Display users of the first page
                 updateCurrentPageUsers(fetchedUsers)
             }
         } catch (error) {
@@ -104,60 +104,60 @@ const AdminDashboard = () => {
         } finally {
             setLoading(false)
         }
-    }    // Gọi API khi thay đổi filter hoặc search
+    }    // Call API when filter or search changes
     useEffect(() => {
         if (user && user.role === 'admin') {
             fetchUsers()
         }
     }, [user, filter])
     
-    // Cập nhật danh sách người dùng khi thay đổi trang
+    // Update user list when page changes
     useEffect(() => {
         updateCurrentPageUsers()
     }, [currentPage])
 
-    // Xử lý tìm kiếm với debounce
+    // Handle search with debounce
     const handleSearch = (e) => {
         const searchTerm = e.target.value
         setSearch(searchTerm)
         
-        // Clear timeout trước đó nếu có
+        // Clear previous timeout if exists
         if (searchTimeout) {
             clearTimeout(searchTimeout)
         }
-          // Tạo timeout mới để delay việc tìm kiếm
+          // Create new timeout to delay search
         const timeout = setTimeout(() => {
             fetchUsers()
-        }, 500) // Đợi 500ms sau khi ngừng gõ
+        }, 500) // Wait 500ms after stopping typing
         
         setSearchTimeout(timeout)
     }
 
-    // Xử lý lọc theo vai trò
+    // Handle filter by role
     const handleFilterChange = (role) => {
         setFilter(role)
     }
-      // Xử lý mở modal thông tin chi tiết
+      // Handle opening detailed information modal
     const handleViewUserDetails = (userData) => {
         setSelectedUser(userData)
         setIsUserDetailsModalOpen(true)
     }
     
-    // Cập nhật danh sách người dùng hiển thị dựa trên trang hiện tại
+    // Update displayed user list based on current page
     const updateCurrentPageUsers = (usersList = allUsers) => {
         const indexOfLastUser = currentPage * usersPerPage
         const indexOfFirstUser = indexOfLastUser - usersPerPage
         setUsers(usersList.slice(indexOfFirstUser, indexOfLastUser))
     }
     
-    // Chuyển sang trang tiếp theo
+    // Go to next page
     const nextPage = () => {
         if (currentPage < Math.ceil(allUsers.length / usersPerPage)) {
             setCurrentPage(currentPage + 1)
         }
     }
     
-    // Quay lại trang trước
+    // Go back to previous page
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1)
@@ -170,7 +170,7 @@ const AdminDashboard = () => {
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-6">User Management</h1>
                 
-                {/* Bảng thống kê */}
+                {/* Statistics table */}
                 {filter === 'all' && !search && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div className="bg-white p-4 rounded-lg shadow border border-gray-100">
@@ -212,7 +212,7 @@ const AdminDashboard = () => {
                 )}
                 
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center mb-6">
-                    {/* Tabs lọc theo vai trò */}
+                    {/* Tabs filter by role */}
                     <div className="flex gap-2">
                         <Button 
                             variant={filter === "all" ? "default" : "outline"}
@@ -234,7 +234,7 @@ const AdminDashboard = () => {
                         </Button>
                     </div>
                     
-                    {/* Ô tìm kiếm */}
+                    {/* Search box */}
                     <div className="relative w-full md:w-64">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
@@ -245,13 +245,13 @@ const AdminDashboard = () => {
                             className="pl-8"
                         />
                     </div>
-                </div>                {/* Hiển thị số lượng người dùng tìm thấy */}
+                </div>                {/* Display number of users found */}
                 <div className="text-sm text-gray-500 mb-4">
                     Found {allUsers.length} users {filter !== 'all' ? `role ${filter}` : ''}
                     {search ? ` fit "${search}"` : ''}
                 </div>
 
-                {/* Bảng danh sách người dùng */}
+                {/* Users list table */}
                 {loading ? (
                     <div className="flex justify-center items-center h-40">
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#007771]"></div>
@@ -307,7 +307,7 @@ const AdminDashboard = () => {
                                         </TableRow>
                                     ))
                                 )}
-                            </TableBody>                        </Table>                        {/* Thêm phân trang */}
+                            </TableBody>                        </Table>                        {/* Add pagination */}
                         {allUsers.length > 0 && (
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-4 px-2 gap-4">
                                 <div className="flex items-center space-x-2 order-2 sm:order-1">
@@ -322,7 +322,7 @@ const AdminDashboard = () => {
                                         Previous
                                     </Button>
                                     
-                                    {/* Hiển thị các số trang */}
+                                    {/* Display page numbers */}
                                     <div className="flex items-center space-x-1">
                                         {Array.from({ length: Math.ceil(allUsers.length / usersPerPage) }, (_, i) => i + 1).map((pageNum) => (
                                             <Button
@@ -357,19 +357,19 @@ const AdminDashboard = () => {
                     </div>
                 )}
                 
-                {/* Modal chi tiết người dùng */}
+                {/* User details modal */}
                 <UserDetailsModal
                     isOpen={isUserDetailsModalOpen}
                     onClose={() => setIsUserDetailsModalOpen(false)}
                     userData={selectedUser}
-                    onUserDeleted={fetchUsers}  // Gọi lại hàm fetchUsers khi user bị xóa
+                    onUserDeleted={fetchUsers}  // Call fetchUsers function when user is deleted
                 />
             </div>
             <div className='max-w-7xl mx-auto my-10 px-24'>
                 <h1 className='text-3xl font-bold mb-10'>Admin Dashboard</h1>
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                    {/* Quản lý công ty */}
+                    {/* Company management */}
                     <div
                         onClick={() => navigate('/admin/companies-all')}
                         className='p-6 border border-gray-200 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-all bg-white'
@@ -381,7 +381,7 @@ const AdminDashboard = () => {
                         <p className='text-gray-600'>Manage all companies in the system</p>
                     </div>
 
-                    {/* Quản lý việc làm */}
+                    {/* Job management */}
                     <div
                         onClick={() => navigate('/admin/all-jobs')}
                         className='p-6 border border-gray-200 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-all bg-white'

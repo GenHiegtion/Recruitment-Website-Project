@@ -6,15 +6,15 @@ import { applyJob, cancelApplication, getApplicants, getAppliedJobs, updateStatu
 
 const router = express.Router();
 
-// Chỉ applicant mới được nộp đơn ứng tuyển
+// Only applicants can submit job applications
 router.route("/apply/:id").get(isAuthenticated, checkRole(['applicant']), applyJob);
-// Chỉ applicant mới được hủy đơn ứng tuyển
+// Only applicant can cancel applications
 router.route("/cancel/:id").delete(isAuthenticated, checkRole(['applicant']), cancelApplication);
-// Applicant xem công việc đã ứng tuyển
+// Applicant views jobs they've applied to
 router.route("/get").get(isAuthenticated, getAppliedJobs);
-// Chỉ recruiter mới được xem danh sách ứng viên
+// Only recruiter can view the list of applicants
 router.route("/:id/applicants").get(isAuthenticated, checkRole(['recruiter']), getApplicants);
-// Chỉ recruiter mới được cập nhật trạng thái ứng tuyển
+// Only recruiter can update application status
 router.route("/status/:id/update").post(isAuthenticated, checkRole(['recruiter']), updateStatus);
 
 export default router;

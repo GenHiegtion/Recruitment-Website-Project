@@ -5,20 +5,20 @@ import { deleteJob, getAllJobsForAdmin, getAdminJobs, getAllJobs, getJobById, po
 
 const router = express.Router();
 
-// Chỉ recruiter mới được đăng tin tuyển dụng
+// Only recruiters can post job listings
 router.route("/post").post(isAuthenticated, checkRole(['recruiter']), postJob);
 
-// Cả applicant và recruiter đều được xem danh sách việc làm
+// Both applicant and recruiter can view job listings
 router.route("/get").get(isAuthenticated, getAllJobs);
 router.route("/get/:id").get(isAuthenticated, getJobById);
 
-// Chỉ recruiter mới được xem danh sách việc làm đã đăng và quản lý chúng
+// Only recruiter can view and manage their posted job listings
 router.route("/getadminjobs").get(isAuthenticated, checkRole(['recruiter']), getAdminJobs);
 router.route("/update/:id").put(isAuthenticated, checkRole(['recruiter']), updateJob);
-// Cho phép cả admin và recruiter xóa công việc
+// Allow both admin and recruiter to delete jobs
 router.route("/delete/:id").delete(isAuthenticated, checkRole(['recruiter', 'admin']), deleteJob);
 
-// Chỉ admin mới được xem tất cả job trong hệ thống
+// Only admins can view all jobs in the system
 router.route("/get-all-jobs").get(isAuthenticated, checkRole(['admin']), getAllJobsForAdmin);
 
 export default router;

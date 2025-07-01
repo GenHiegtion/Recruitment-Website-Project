@@ -12,12 +12,12 @@ const useGetAllCompaniesAdmin = (search = '') => {
     
     useEffect(() => {
         const fetchAllCompanies = async () => {
-            // Chỉ thực hiện khi đã đăng nhập và là admin
+            // Only execute when logged in and is admin
             if (!user || user.role !== 'admin') return
             
             try {
                 setLoading(true)
-                // Xây dựng URL với tham số tìm kiếm nếu có
+                // Build URL with search parameters if available
                 let url = `${COMPANY_API_END_POINT}/all`
                 if (search) {
                     url += `?search=${search}`
@@ -28,7 +28,7 @@ const useGetAllCompaniesAdmin = (search = '') => {
                 })
                 
                 if (res.data.success) {
-                    // Cập nhật state global với danh sách công ty
+                    // Update global state with companies list
                     dispatch(setCompanies(res.data.companies))
                 }
             } catch (error) {

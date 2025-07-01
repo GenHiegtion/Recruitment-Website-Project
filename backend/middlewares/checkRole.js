@@ -1,27 +1,27 @@
 import { User } from "../models/user.model.js";
 
 /**
- * Middleware kiểm tra người dùng có vai trò được chỉ định không
- * @param {string[]} roles - Mảng các vai trò được phép truy cập
+ * Middleware to check if user has the specified role
+ * @param {string[]} roles - Array of roles allowed to access
  * @returns {function} Middleware
  */
 const checkRole = (roles) => {
     return async (req, res, next) => {
         try {
-            // userId đã được lấy từ token trong middleware isAuthenticated
+            // userId was obtained from token in isAuthenticated middleware
             const userId = req.id;
             
-            // Tìm thông tin người dùng trong CSDL để lấy vai trò
+            // Find user information in the database to get the role
             const user = await User.findById(userId);
             
             if (!user) {
                 return res.status(404).json({
-                    message: "Không tìm thấy thông tin người dùng",
+                    message: "User information not found",
                     success: false
                 });
             }
             
-            // Kiểm tra xem vai trò của người dùng có trong mảng các vai trò được phép không
+            // Check if user's role is in the array of permitted roles
             if (!roles.includes(user.role)) {
                 return res.status(403).json({
                     message: "You have no authorization to access this resource",
@@ -29,15 +29,15 @@ const checkRole = (roles) => {
                 });
             }
             
-            // Nếu người dùng có quyền, lưu thông tin role vào request để sử dụng sau này nếu cần
+            // If user has permission, save role information in request for later use if needed
             req.userRole = user.role;
             
-            // Tiếp tục xử lý request
+            // Continue processing request
             next();
         } catch (error) {
             console.log("Role check error:", error);
             return res.status(500).json({
-                message: "Lỗi kiểm tra quyền truy cập",
+                message: "Error checking access permission",
                 success: false
             });
         }

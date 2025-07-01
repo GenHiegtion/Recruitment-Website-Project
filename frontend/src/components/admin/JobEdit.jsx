@@ -35,7 +35,7 @@ const JobEdit = () => {
         setInput({ ...input, [e.target.name]: e.target.value });
     }
 
-    // Lấy thông tin job hiện tại
+    // Get current job information
     useEffect(() => {
         const fetchJobDetails = async () => {
             try {
@@ -54,7 +54,7 @@ const JobEdit = () => {
         fetchJobDetails();
     }, [jobId, dispatch]);
 
-    // Cập nhật state khi có dữ liệu job
+    // Update state when job data is available
     useEffect(() => {
         if (singleJob) {
             setInput({

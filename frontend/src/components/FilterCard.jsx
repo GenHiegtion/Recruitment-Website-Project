@@ -27,7 +27,7 @@ const FilterCard = () => {
     const { selectedIndustry, selectedLocation } = useSelector(state => state.job);
 
     const handleFilterClick = (type, value) => {
-        // Nếu đã chọn giá trị này rồi, bỏ chọn nó
+        // If this value is already selected, deselect it
         if (type === "Industry") {
             if (selectedIndustry === value) {
                 dispatch(setSelectedIndustry(''));
@@ -65,7 +65,7 @@ const FilterCard = () => {
             </div>
             <hr className='mt-3 mb-4' />
             
-            {/* Phần lọc Industry */}
+            {/* Industry filter section */}
             <div className="mb-4">
                 <h2 className='font-bold text-lg'>Industry</h2>
                 <div className="grid grid-cols-1 gap-1 mt-2">
@@ -85,7 +85,7 @@ const FilterCard = () => {
                 </div>
             </div>
             
-            {/* Phần lọc Location */}
+            {/* Location filter section */}
             <div className="mb-4">
                 <h2 className='font-bold text-lg'>Location</h2>
                 <div className="grid grid-cols-1 gap-1 mt-2">
@@ -105,7 +105,7 @@ const FilterCard = () => {
                 </div>
             </div>
             
-            {/* Phần hiển thị bộ lọc đã chọn */}
+            {/* Section displaying selected filters */}
             {(selectedIndustry || selectedLocation) && (
                 <div className="border-t pt-3">
                     <h2 className="font-medium text-sm text-gray-700 mb-2">Filter by:</h2>

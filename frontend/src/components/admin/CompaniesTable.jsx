@@ -16,11 +16,11 @@ const CompaniesTable = () => {
     const [filterCompany, setFilterCompany] = useState(companies);
     const navigate = useNavigate();
     
-    // State cho phân trang
+    // State for pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [companiesPerPage] = useState(5);
     
-    // State cho dialog xóa company
+    // State for company delete dialog
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [companyToDelete, setCompanyToDelete] = useState(null);
@@ -34,27 +34,27 @@ const CompaniesTable = () => {
 
         });
         setFilterCompany(filteredCompany);
-    }, [companies, searchCompanyByText])    // Lấy các công ty cho trang hiện tại
+    }, [companies, searchCompanyByText])    // Get companies for current page
     const indexOfLastCompany = currentPage * companiesPerPage;
     const indexOfFirstCompany = indexOfLastCompany - companiesPerPage;
     const currentCompanies = filterCompany ? filterCompany.slice(indexOfFirstCompany, indexOfLastCompany) : [];
 
-    // Đổi trang
+    // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    // Đi đến trang tiếp
+    // Go to next page
     const nextPage = () => {
         if (currentPage < Math.ceil((filterCompany?.length || 0) / companiesPerPage)) {
             setCurrentPage(currentPage + 1);
         }
-    };    // Quay lại trang trước
+    };    // Go back to previous page
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
     
-    // Xử lý xóa company
+    // Handle company deletion
     const handleDeleteCompany = async () => {
         if (!companyToDelete) return;
         
@@ -65,15 +65,15 @@ const CompaniesTable = () => {
             });
             
             if (response.data.success) {
-                // Cập nhật lại state để hiển thị danh sách không có company vừa xóa
+                // Update state to display list without the just deleted company
                 setFilterCompany(prevCompanies => 
                     prevCompanies.filter(company => company._id !== companyToDelete._id)
                 );
                 
                 toast.success(`Deleted company ${companyToDelete.name} and ${response.data.deletedJobsCount || 0} relevant jobs`);
                 
-                // Nếu trang hiện tại không còn company nào sau khi xóa và không phải trang đầu tiên
-                // thì quay lại trang trước đó
+                // If current page has no companies left after deletion and it's not the first page
+                // then go back to previous page
                 if (currentCompanies.length === 1 && currentPage > 1) {
                     setCurrentPage(currentPage - 1);
                 }
@@ -148,7 +148,7 @@ const CompaniesTable = () => {
                         ))
                     }
                 </TableBody>
-            </Table>            {/* Phân trang */}
+            </Table>            {/* Pagination */}
             {filterCompany && filterCompany.length > 0 && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-4 px-2 gap-4">
                     <div className="flex items-center space-x-2 order-2 sm:order-1">
@@ -163,7 +163,7 @@ const CompaniesTable = () => {
                             Previous
                         </Button>
                         
-                        {/* Hiển thị các số trang */}
+                        {/* Display page numbers */}
                         <div className="flex items-center space-x-1">
                             {Array.from({ length: Math.ceil((filterCompany?.length || 0) / companiesPerPage) }, (_, i) => i + 1).map((pageNum) => (
                                 <Button
@@ -195,7 +195,7 @@ const CompaniesTable = () => {
                     </div>
                 </div>            )}
             
-            {/* Dialog xác nhận xóa */}
+            {/* Delete confirmation dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>

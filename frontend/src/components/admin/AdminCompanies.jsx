@@ -27,14 +27,14 @@ const AdminCompanies = () => {
     const [displayedCompanies, setDisplayedCompanies] = useState([])
     const [allCompanies, setAllCompanies] = useState([])
     
-    // Thêm state cho phân trang
+    // Add state for pagination
     const [currentPage, setCurrentPage] = useState(1)
-    const companiesPerPage = 5 // Số công ty trên mỗi trang
+    const companiesPerPage = 5 // Number of companies per page
     
-    // Sử dụng custom hook để lấy danh sách công ty
+    // Use custom hook to get companies list
     const { loading } = useGetAllCompaniesAdmin(search)
 
-    // Chỉ cho phép admin truy cập trang này
+    // Only allow admin to access this page
     useEffect(() => {
         if (!user) {
             navigate('/login')
@@ -44,58 +44,58 @@ const AdminCompanies = () => {
         }
     }, [user, navigate])
 
-    // Cập nhật danh sách công ty khi companies thay đổi
+    // Update companies list when companies change
     useEffect(() => {
         if (companies && companies.length > 0) {
             setAllCompanies(companies)
-            setCurrentPage(1) // Reset về trang đầu tiên khi có dữ liệu mới
+            setCurrentPage(1) // Reset to the first page when new data is available
             updateCurrentPageCompanies(companies)
         }
     }, [companies])
     
-    // Cập nhật danh sách công ty khi thay đổi trang
+    // Update companies list when page changes
     useEffect(() => {
         updateCurrentPageCompanies()
     }, [currentPage])
     
-    // Cập nhật danh sách công ty hiển thị dựa trên trang hiện tại
+    // Update displayed companies list based on current page
     const updateCurrentPageCompanies = (companyList = allCompanies) => {
         const indexOfLastCompany = currentPage * companiesPerPage
         const indexOfFirstCompany = indexOfLastCompany - companiesPerPage
         setDisplayedCompanies(companyList.slice(indexOfFirstCompany, indexOfLastCompany))
     }
     
-    // Chuyển sang trang tiếp theo
+    // Go to next page
     const nextPage = () => {
         if (currentPage < Math.ceil(allCompanies.length / companiesPerPage)) {
             setCurrentPage(currentPage + 1)
         }
     }
     
-    // Quay lại trang trước
+    // Go back to previous page
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1)
         }
     }
 
-    // Xử lý tìm kiếm với debounce
+    // Handle search with debounce
     const handleSearch = (e) => {
         const searchTerm = e.target.value
         setSearch(searchTerm)
         
-        // Clear timeout trước đó nếu có
+        // Clear previous timeout if exists
         if (searchTimeout) {
             clearTimeout(searchTimeout)
         }
         
-        // Tạo timeout mới để delay việc tìm kiếm
+        // Create new timeout to delay search
         const timeout = setTimeout(() => {
-            // Tìm kiếm sẽ được thực hiện trong useGetAllCompaniesAdmin hook
+            // Search will be performed in the useGetAllCompaniesAdmin hook
         }, 500)
         
         setSearchTimeout(timeout)
-    }    // Format ngày tháng
+    }    // Format date
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         try {
@@ -107,7 +107,7 @@ const AdminCompanies = () => {
         }
     }
 
-    // Hàm điều hướng đến trang chi tiết công ty
+    // Function to navigate to company detail page
     const handleViewCompanyDetail = (companyId) => {
         navigate(`/admin/companies-detail/${companyId}`);
     };
@@ -118,7 +118,7 @@ const AdminCompanies = () => {
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-6">Company Management</h1>
                 
-                {/* Tiêu đề và số liệu tổng quan */}
+                {/* Title and overview statistics */}
                 <div className="bg-white p-4 rounded-lg shadow border border-gray-100 mb-6">
                     <div className="flex justify-between items-center">
                         <div>
@@ -131,7 +131,7 @@ const AdminCompanies = () => {
                     </div>
                 </div>
                 
-                {/* Ô tìm kiếm */}
+                {/* Search box */}
                 <div className="flex justify-between items-center mb-6">
                     <div className="relative w-full md:w-64">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -145,13 +145,13 @@ const AdminCompanies = () => {
                     </div>
                 </div>
 
-                {/* Hiển thị số lượng công ty tìm thấy */}
+                {/* Display number of companies found */}
                 <div className="text-sm text-gray-500 mb-4">
                     Found {companies.length} companies
                     {search ? ` fit "${search}"` : ''}
                 </div>
 
-                {/* Bảng danh sách công ty */}
+                {/* Companies list table */}
                 {loading ? (
                     <div className="flex justify-center items-center h-40">
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#007771]"></div>
@@ -219,7 +219,7 @@ const AdminCompanies = () => {
                             </TableBody>
                         </Table>
                         
-                        {/* Thêm phân trang */}
+                        {/* Add pagination */}
                         {allCompanies.length > 0 && (
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-4 px-2 gap-4">
                                 <div className="flex items-center space-x-2 order-2 sm:order-1">
@@ -234,7 +234,7 @@ const AdminCompanies = () => {
                                         Previous
                                     </Button>
                                     
-                                    {/* Hiển thị các số trang */}
+                                    {/* Display page numbers */}
                                     <div className="flex items-center space-x-1">
                                         {Array.from({ length: Math.ceil(allCompanies.length / companiesPerPage) }, (_, i) => i + 1).map((pageNum) => (
                                             <Button

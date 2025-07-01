@@ -14,23 +14,23 @@ const Browse = () => {
     const { allJobs, searchedQuery } = useSelector(store => store.job);
       console.log("Current search query:", searchedQuery);
     
-    // Tạo biến trung gian cho tiêu đề
+    // Create intermediate variable for title
     const searchTitle = searchedQuery 
         ? `Search Results for "${searchedQuery}" (${allJobs.length})` 
         : `Search Results (${allJobs.length})`;
     
     console.log("Title will be:", searchTitle);
     
-    // Thêm state cho phân trang
+    // Add state for pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const jobsPerPage = 6; // Số job trên mỗi trang (6 job/trang cho applicant)
+    const jobsPerPage = 6; // Number of jobs per page (6 jobs/page for applicant)
     
-    // Tính toán job cho trang hiện tại
+    // Calculate jobs for current page
     const indexOfLastJob = currentPage * jobsPerPage;
     const indexOfFirstJob = indexOfLastJob - jobsPerPage;
     const currentJobs = allJobs.slice(indexOfFirstJob, indexOfLastJob);
     
-    // Các hàm điều hướng phân trang
+    // Pagination navigation functions
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
     
     const nextPage = () => {
@@ -45,13 +45,13 @@ const Browse = () => {
         }
     };
     
-    // Reset query khi rời khỏi trang
+    // Reset query when leaving the page
     useEffect(() => {
         return () => {
             dispatch(setSearchedQuery(""));
         }
     }, []);
-      // Reset về trang 1 khi allJobs thay đổi (khi tìm kiếm mới)
+      // Reset to page 1 when allJobs changes (when new search)
     useEffect(() => {
         setCurrentPage(1);
     }, [allJobs]);
@@ -80,7 +80,7 @@ const Browse = () => {
                     }
                 </div>
                 
-                {/* Phân trang */}
+                {/* Pagination */}
                 {allJobs.length > 0 && (
                     <div className="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4">
                         <div className="flex items-center space-x-2 order-2 sm:order-1">
@@ -95,7 +95,7 @@ const Browse = () => {
                                 Previous
                             </Button>
                             
-                            {/* Hiển thị các số trang */}
+                            {/* Display page numbers */}
                             <div className="flex items-center space-x-1">
                                 {Array.from({ length: Math.ceil(allJobs.length / jobsPerPage) }, (_, i) => i + 1).map((pageNum) => (
                                     <Button

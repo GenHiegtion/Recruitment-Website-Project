@@ -14,7 +14,7 @@ const useGetAllJobsAdmin = (searchKeyword = '') => {
             try {
                 setLoading(true)
                 
-                // Tạo query string cho việc tìm kiếm
+                // Create query string for searching
                 let url = `${JOB_API_END_POINT}/get-all-jobs`
                 if (searchKeyword) {
                     url += `?keyword=${encodeURIComponent(searchKeyword)}`

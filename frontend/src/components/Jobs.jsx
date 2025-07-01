@@ -11,39 +11,39 @@ const Jobs = () => {
     const { allJobs, selectedIndustry, selectedLocation } = useSelector(store => store.job);
     const [filterJobs, setFilterJobs] = useState(allJobs);
     
-    // Thêm state cho phân trang
+    // Added state for pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const jobsPerPage = 6; // Số job trên mỗi trang (6 job/trang cho applicant)
+    const jobsPerPage = 6; // Number of jobs per page (6 jobs/page for applicant)
 
     useEffect(() => {
-        // Bắt đầu với tất cả các công việc
+        // Start with all jobs
         let filteredJobs = [...allJobs];
         
-        // Lọc theo Industry nếu có
+        // Filter by Industry if selected
         if (selectedIndustry) {
             filteredJobs = filteredJobs.filter(job => 
                 job.title.toLowerCase() === selectedIndustry.toLowerCase()
             );
         }
         
-        // Lọc theo Location nếu có
+        // Filter by Location if selected
         if (selectedLocation) {
             filteredJobs = filteredJobs.filter(job => 
                 job.location.toLowerCase() === selectedLocation.toLowerCase()
             );
         }
         
-        // Cập nhật state với kết quả lọc
+        // Update state with filtered results
         setFilterJobs(filteredJobs);
-        setCurrentPage(1); // Reset về trang đầu khi thay đổi bộ lọc
+        setCurrentPage(1); // Reset to first page when filters change
     }, [allJobs, selectedIndustry, selectedLocation]);
     
-    // Lấy job cho trang hiện tại
+    // Get jobs for the current page
     const indexOfLastJob = currentPage * jobsPerPage;
     const indexOfFirstJob = indexOfLastJob - jobsPerPage;
     const currentJobs = filterJobs.slice(indexOfFirstJob, indexOfLastJob);
     
-    // Các hàm điều hướng phân trang
+    // Pagination navigation functions
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
     
     const nextPage = () => {
@@ -69,7 +69,7 @@ const Jobs = () => {
                     {
                         filterJobs.length <= 0 ? (
                             <div className="flex-1 flex items-center justify-center">
-                                <span className="text-gray-500">Không tìm thấy công việc phù hợp</span>
+                                <span className="text-gray-500">Unable to find appropriate job!</span>
                             </div>
                         ) : (
                             <div className='flex-1 pb-5'>
@@ -88,7 +88,7 @@ const Jobs = () => {
                                     }
                                 </div>
                                 
-                                {/* Phân trang */}
+                                {/* Paginate */}
                                 {filterJobs.length > 0 && (
                                     <div className="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4">
                                         <div className="flex items-center space-x-2 order-2 sm:order-1">
@@ -103,7 +103,7 @@ const Jobs = () => {
                                                 Previous
                                             </Button>
                                             
-                                            {/* Hiển thị các số trang */}
+                                            {/* Display page numbers */}
                                             <div className="flex items-center space-x-1">
                                                 {Array.from({ length: Math.ceil(filterJobs.length / jobsPerPage) }, (_, i) => i + 1).map((pageNum) => (
                                                     <Button

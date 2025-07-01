@@ -81,14 +81,14 @@ const Job = ({ job }) => {
                 <p className='text-sm text-gray-600'>{job?.description}</p>
             </div>
             
-            {/* Thay đổi từ flex thành flex-wrap để các badges có thể xuống dòng khi không đủ chỗ */}
+            {/* Changed from flex to flex-wrap so badges can wrap to the next line when there's not enough space */}
             <div className='flex flex-wrap items-center gap-2 mt-4'>
                 <Badge className={'text-blue-700 font-bold text-xs'} variant="ghost">{job?.position} Positions</Badge>
                 <Badge className={'text-[#FBBC09] font-bold text-xs'} variant="ghost">{job?.jobType}</Badge>
                 <Badge className={'text-[#14AE5C] font-bold text-xs'} variant="ghost">{job?.salary}tr VND</Badge>
             </div>
             
-            {/* Thêm justify-between để buttons căn đều hai bên */}
+            {/* Add justify-between to align buttons evenly on both sides */}
             <div className='flex items-center justify-between gap-2 mt-4'>
                 <Button onClick={() => navigate(`/description/${job?._id}`)} variant="outline" className="text-sm px-4">Details</Button>
                 <Button 

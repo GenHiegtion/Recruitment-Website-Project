@@ -19,7 +19,7 @@ const CompanyDetail = () => {
     const [companyJobs, setCompanyJobs] = useState([])
     const [loading, setLoading] = useState(true)
     const [isDeleting, setIsDeleting] = useState(false)
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)    // Chỉ cho phép admin và recruiter truy cập trang này
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)    // Only allow admin and recruiter to access this page
     useEffect(() => {
         if (!user) {
             navigate('/login')
@@ -29,7 +29,7 @@ const CompanyDetail = () => {
         }
     }, [user, navigate])
 
-    // Lấy thông tin chi tiết công ty
+    // Get company details
     useEffect(() => {
         const fetchCompanyDetail = async () => {
             try {
@@ -41,7 +41,7 @@ const CompanyDetail = () => {
                 if (response.data.success) {
                     setCompany(response.data.company)
                     
-                    // Lấy danh sách công việc của công ty này
+                    // Get list of jobs for this company
                     try {
                         const jobsResponse = await axios.get(`${JOB_API_END_POINT}/get?company=${id}`, {
                             withCredentials: true
@@ -54,7 +54,7 @@ const CompanyDetail = () => {
                         console.error('Error fetching company jobs:', error)
                     }                } else {
                     toast.error('Failed to load company information')
-                    // Điều hướng dựa trên vai trò
+                    // Navigate based on role
                     if (user.role === 'admin') {
                         navigate('/admin/companies-all')
                     } else {
@@ -64,7 +64,7 @@ const CompanyDetail = () => {
             } catch (error) {
                 console.error('Error fetching company details:', error)
                 toast.error('Error loading company information')
-                // Điều hướng dựa trên vai trò
+                // Navigate based on role
                 if (user.role === 'admin') {
                     navigate('/admin/companies-all')
                 } else {
@@ -96,7 +96,7 @@ const CompanyDetail = () => {
             });
               if (response.data.success) {
                 toast.success(`Deleted company ${company.name} and ${response.data.deletedJobsCount} relevant jobs`);
-                // Điều hướng dựa trên vai trò
+                // Navigate based on role
                 if (user.role === 'admin') {
                     navigate('/admin/companies-all');
                 } else {
@@ -112,7 +112,7 @@ const CompanyDetail = () => {
             setIsDeleting(false);
             setIsDeleteDialogOpen(false);
         }
-    };    // Format ngày tháng
+    };    // Format date
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         try {
@@ -145,11 +145,11 @@ const CompanyDetail = () => {
                         variant="ghost" 
                         className="mb-4 flex items-center"
                         onClick={() => {
-                            // Kiểm tra vai trò người dùng để điều hướng đến trang phù hợp
+                            // Check user role to redirect to appropriate page
                             if (user.role === 'admin') {
                                 navigate('/admin/companies-all');
                             } else {
-                                // Nếu là recruiter hoặc vai trò khác, điều hướng đến trang quản lý công ty
+                                // If recruiter or other role, redirect to company management page
                                 navigate('/admin/companies');
                             }
                         }}
@@ -158,7 +158,7 @@ const CompanyDetail = () => {
                         Back
                     </Button>
                     
-                    {/* Chỉ hiển thị nút delete cho admin */}
+                    {/* Only show delete button for admin */}
                     {user.role === 'admin' && (
                         <Button
                             onClick={openDeleteDialog}
@@ -172,7 +172,7 @@ const CompanyDetail = () => {
 
                 <div className="bg-white rounded-lg shadow p-6">
                     <div className="flex flex-col md:flex-row items-start gap-6">
-                        {/* Logo và thông tin cơ bản */}
+                        {/* Logo and basic information */}
                         <div className="w-full md:w-1/3 flex flex-col items-center">
                             <Avatar className="h-40 w-40 mb-4">
                                 {company?.logo ? (
@@ -211,13 +211,13 @@ const CompanyDetail = () => {
                             </div>
                         </div>
                         
-                        {/* Thông tin chi tiết và danh sách công việc */}
+                        {/* Detailed information and job listings */}
                         <div className="w-full md:w-2/3">
                             <h2 className="text-xl font-bold mb-4 border-b pb-2">Company Information</h2>
                             
                             <div className="mb-6">
                                 <p className="text-gray-700">
-                                    {company?.description || 'Không có mô tả cho công ty này.'}
+                                    {company?.description || 'No description available for this company.'}
                                 </p>
                             </div>
                             
@@ -257,7 +257,7 @@ const CompanyDetail = () => {
                 </div>
             </div>
 
-            {/* Dialog xác nhận xóa */}
+            {/* Delete confirmation dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>

@@ -16,11 +16,11 @@ const AdminJobsTable = () => {
     const [filterJobs, setFilterJobs] = useState(allAdminJobs);
     const navigate = useNavigate();
     
-    // State cho phân trang
+    // State for pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [jobsPerPage] = useState(5);
     
-    // State cho dialog xóa job
+    // State for job delete dialog
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [jobToDelete, setJobToDelete] = useState(null);useEffect(() => {
@@ -31,30 +31,30 @@ const AdminJobsTable = () => {
             return job?.title?.toLowerCase().includes(searchJobByText.toLowerCase()) || job?.company?.name.toLowerCase().includes(searchJobByText.toLowerCase());
         });
         setFilterJobs(filteredJobs);
-        setCurrentPage(1); // Reset về trang đầu tiên khi thay đổi bộ lọc
+        setCurrentPage(1); // Reset to first page when filters change
     }, [allAdminJobs, searchJobByText])
     
-    // Lấy các công việc cho trang hiện tại
+    // Get jobs for the current page
     const indexOfLastJob = currentPage * jobsPerPage;
     const indexOfFirstJob = indexOfLastJob - jobsPerPage;
     const currentJobs = filterJobs ? filterJobs.slice(indexOfFirstJob, indexOfLastJob) : [];
 
-    // Đổi trang
+    // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    // Đi đến trang tiếp
+    // Go to next page
     const nextPage = () => {
         if (currentPage < Math.ceil((filterJobs?.length || 0) / jobsPerPage)) {
             setCurrentPage(currentPage + 1);
         }
-    };    // Quay lại trang trước
+    };    // Go back to previous page
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
     
-    // Xử lý xóa job
+    // Handle job deletion
     const handleDeleteJob = async () => {
         if (!jobToDelete) return;
         
@@ -65,15 +65,15 @@ const AdminJobsTable = () => {
             });
             
             if (response.data.success) {
-                // Cập nhật lại state để hiển thị danh sách không có job vừa xóa
+                // Update state to display list without the just deleted job
                 setFilterJobs(prevJobs => 
                     prevJobs.filter(job => job._id !== jobToDelete._id)
                 );
                 
                 toast.success(`Deleted job ${jobToDelete.title} and relevant application.`);
                 
-                // Nếu trang hiện tại không còn job nào sau khi xóa và không phải trang đầu tiên
-                // thì quay lại trang trước đó
+                // If current page has no jobs left after deletion and it's not the first page
+                // then go back to previous page
                 if (currentJobs.length === 1 && currentPage > 1) {
                     setCurrentPage(currentPage - 1);
                 }
@@ -160,7 +160,7 @@ const AdminJobsTable = () => {
                 </TableBody>
             </Table>
 
-            {/* Phân trang */}
+            {/* Pagination */}
             {filterJobs && filterJobs.length > 0 && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-4 px-2 gap-4">
                     <div className="flex items-center space-x-2 order-2 sm:order-1">
@@ -175,7 +175,7 @@ const AdminJobsTable = () => {
                             Previous
                         </Button>
                         
-                        {/* Hiển thị các số trang */}
+                        {/* Display page numbers */}
                         <div className="flex items-center space-x-1">
                             {Array.from({ length: Math.ceil((filterJobs?.length || 0) / jobsPerPage) }, (_, i) => i + 1).map((pageNum) => (
                                 <Button
@@ -207,7 +207,7 @@ const AdminJobsTable = () => {
                     </div>                </div>
             )}
             
-            {/* Dialog xác nhận xóa */}
+            {/* Delete confirmation dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>

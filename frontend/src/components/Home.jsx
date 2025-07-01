@@ -13,7 +13,7 @@ const Home = () => {
   useGetAllJobs();
   const { user } = useSelector(store => store.auth);
   
-  // Kiểm tra nếu người dùng là admin
+  // Check if user is admin
   if (user?.role === 'admin') {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
@@ -26,7 +26,7 @@ const Home = () => {
     )
   }
   
-  // Kiểm tra nếu người dùng là recruiter
+  // Check if user is recruiter
   if (user?.role === 'recruiter') {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
@@ -38,7 +38,7 @@ const Home = () => {
       </div>
     )
   }
-    // Người dùng thông thường hoặc chưa đăng nhập
+    // Regular user or not logged in
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

@@ -52,7 +52,7 @@ const useManageSavedJobs = () => {
             console.log('Save job response:', res.data);
             
             if (res.data.success) {
-                toast.success(res.data.message || 'Đã lưu công việc thành công');
+                toast.success(res.data.message || 'Job saved successfully');
                 fetchSavedJobs(); // Refresh saved jobs list
             }
         } catch (error) {
@@ -61,7 +61,7 @@ const useManageSavedJobs = () => {
                 console.log('Error response data:', error.response.data);
                 console.log('Error response status:', error.response.status);
             }
-            toast.error(error.response?.data?.message || "Không thể lưu công việc này");
+            toast.error(error.response?.data?.message || "Unable to save this job");
         } finally {
             setIsLoading(false);
         }
@@ -86,7 +86,7 @@ const useManageSavedJobs = () => {
             console.log('Unsave job response:', res.data);
             
             if (res.data.success) {
-                toast.success(res.data.message || 'Đã bỏ lưu công việc');
+                toast.success(res.data.message || 'Job unsaved successfully');
                 dispatch(removeSavedJob(jobId));
             }
         } catch (error) {
@@ -95,7 +95,7 @@ const useManageSavedJobs = () => {
                 console.log('Error response data:', error.response.data);
                 console.log('Error response status:', error.response.status);
             }
-            toast.error(error.response?.data?.message || "Không thể bỏ lưu công việc này");
+            toast.error(error.response?.data?.message || "Unable to unsave this job");
         } finally {
             setIsLoading(false);
         }

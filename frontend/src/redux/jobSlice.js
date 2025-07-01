@@ -10,7 +10,7 @@ const initialState = {
     filterType: "",
     selectedIndustry: "",
     selectedLocation: "",
-    allJobsAdmin: [] // Thêm state mới để lưu tất cả job từ admin view
+    allJobsAdmin: [] // Added new state to store all jobs from admin view
 }
 
 const jobSlice = createSlice({
@@ -39,25 +39,25 @@ const jobSlice = createSlice({
         setFilterType: (state, action) => {
             state.filterType = action.payload;
         },
-        // Thêm action mới để cập nhật lọc industry
+        // Added new action to update industry filter
         setSelectedIndustry: (state, action) => {
             state.selectedIndustry = action.payload;
         },
-        // Thêm action mới để cập nhật lọc location
+        // Added new action to update location filter
         setSelectedLocation: (state, action) => {
             state.selectedLocation = action.payload;
         },
-        // Thêm action để reset các bộ lọc
+        // Added action to reset all filters
         resetFilters: (state) => {
             state.searchedQuery = "";
             state.filterType = "";
             state.selectedIndustry = "";
             state.selectedLocation = "";
-        },        // Thêm action mới để lưu tất cả job từ admin view
+        },        // Added new action to store all jobs from admin view
         setAllJobsAdmin: (state, action) => {
             state.allJobsAdmin = action.payload;
         },
-        // Thêm action để xóa job đã apply khi applicant hủy đơn ứng tuyển
+        // Added action to remove applied job when applicant cancels application
         removeAppliedJob: (state, action) => {
             state.allAppliedJobs = state.allAppliedJobs.filter(job => job._id !== action.payload);
         }

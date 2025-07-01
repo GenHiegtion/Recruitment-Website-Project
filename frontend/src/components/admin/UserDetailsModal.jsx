@@ -38,7 +38,7 @@ const UserDetailsModal = ({ isOpen, onClose, userData, onUserDeleted }) => {
       if (response.data.success) {
         let message = `Deleted user ${userData.fullname}`;
         
-        // Hiển thị thông tin chi tiết về dữ liệu đã bị xóa
+        // Display details about deleted data
         if (userData.role === 'recruiter') {
           message += ` and ${response.data.deletedData.companies} company, ${response.data.deletedData.jobs} job, ${response.data.deletedData.applications} relevant application`;
         } else if (userData.role === 'applicant') {
@@ -47,11 +47,11 @@ const UserDetailsModal = ({ isOpen, onClose, userData, onUserDeleted }) => {
         
         toast.success(message);
         
-        // Đóng dialog và thông báo cho component cha rằng user đã bị xóa
+        // Close dialog and notify parent component that the user has been deleted
         closeDeleteDialog();
         onClose();
         
-        // Gọi callback để cập nhật danh sách user
+        // Call callback to update users list
         if (onUserDeleted) {
           onUserDeleted();
         }
@@ -146,7 +146,7 @@ const UserDetailsModal = ({ isOpen, onClose, userData, onUserDeleted }) => {
               <span>Join: {userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('vi-VN') : "N/A"}</span>
             </div>
             
-            {/* Di chuyển nút xóa lên trên và thay đổi kích thước để dễ nhìn thấy hơn */}
+            {/* Move button delete up và resize to see more easily*/}
             {userData.role !== 'admin' && (
               <div className="border-t pt-4 mt-4 sticky bottom-0">
                 <Button
@@ -164,7 +164,7 @@ const UserDetailsModal = ({ isOpen, onClose, userData, onUserDeleted }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog xác nhận xóa user */}
+      {/* Dialog confirm delete user */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -173,7 +173,7 @@ const UserDetailsModal = ({ isOpen, onClose, userData, onUserDeleted }) => {
               {userData.role === 'recruiter' ? (
                 <>
                   Are you sure to delete user {userData.fullname}? <br />
-                  All companies, jobs và relevant application will be deleted. <br />
+                  All companies, jobs and relevant applications will be deleted. <br />
                 </>
               ) : (
                 <>

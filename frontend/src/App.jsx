@@ -54,7 +54,7 @@ const appRouter = createBrowserRouter([
     path: "/saved-jobs",
     element: <SavedJobs />
   },
-  // Admin Dashboard routes - Chỉ dành cho admin
+  // Admin Dashboard routes - Only for admins
   {
     path: "/admin/dashboard",
     element: <ProtectedRoute adminOnly={true}><AdminDashboard /></ProtectedRoute>
@@ -67,17 +67,17 @@ const appRouter = createBrowserRouter([
     path: "/admin/companies-detail/:id",
     element: <ProtectedRoute><CompanyDetail /></ProtectedRoute>
   },
-  // Thêm route mới cho admin xem tất cả job
+  // Added new route for admin to view all jobs
   {
     path: "/admin/all-jobs",
     element: <ProtectedRoute adminOnly={true}><AdminAllJobs /></ProtectedRoute>
   },
-  // Thêm route mới cho admin profile
+  // Added new route for admin profile
   {
     path: "/admin/profile",
     element: <ProtectedRoute adminOnly={true}><AdminProfile /></ProtectedRoute>
   },
-  // Routes dành cho cả admin và recruiter
+  // Routes for both admin and recruiter
   {
     path: "/admin/companies",
     element: <ProtectedRoute><Companies /></ProtectedRoute>

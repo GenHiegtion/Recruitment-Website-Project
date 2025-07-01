@@ -26,15 +26,15 @@ const AdminAllJobs = () => {
     const [search, setSearch] = useState('')
     const [searchTimeout, setSearchTimeout] = useState(null)
     
-    // Thêm state cho phân trang
+    // Added state for pagination
     const [currentJobs, setCurrentJobs] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
-    const jobsPerPage = 5 // Số công việc trên mỗi trang
+    const jobsPerPage = 5 // Number of jobs per page
     
-    // Sử dụng custom hook để lấy danh sách job
+    // Use custom hook to get jobs list
     const { loading } = useGetAllJobsAdmin(search)
 
-    // Chỉ cho phép admin truy cập trang này
+    // Only allow admin to access this page
     useEffect(() => {
         if (!user) {
             navigate('/login')
@@ -44,29 +44,29 @@ const AdminAllJobs = () => {
         }
     }, [user, navigate])
 
-    // Cập nhật danh sách công việc theo trang hiện tại
+    // Update job list based on current page
     useEffect(() => {
         updateCurrentPageJobs()
     }, [currentPage, jobs])
 
-    // Xử lý tìm kiếm với debounce
+    // Handle search with debounce
     const handleSearch = (e) => {
         const searchTerm = e.target.value
         setSearch(searchTerm)
         
-        // Clear timeout trước đó nếu có
+        // Clear previous timeout if exists
         if (searchTimeout) {
             clearTimeout(searchTimeout)
         }
         
-        // Tạo timeout mới để delay việc tìm kiếm
+        // Create new timeout to delay search
         const timeout = setTimeout(() => {
-            // Tìm kiếm sẽ được thực hiện trong useGetAllJobsAdmin hook
-            setCurrentPage(1) // Reset về trang đầu tiên khi tìm kiếm
+            // Search will be performed in the useGetAllJobsAdmin hook
+            setCurrentPage(1) // Reset to first page when searching
         }, 500)
         
         setSearchTimeout(timeout)
-    }    // Format ngày tháng
+    }    // Format date
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         try {
@@ -78,7 +78,7 @@ const AdminAllJobs = () => {
         }
     }
     
-    // Cập nhật danh sách công việc hiển thị dựa trên trang hiện tại
+    // Update displayed job list based on current page
     const updateCurrentPageJobs = () => {
         if (!jobs) return
         const indexOfLastJob = currentPage * jobsPerPage
@@ -86,14 +86,14 @@ const AdminAllJobs = () => {
         setCurrentJobs(jobs.slice(indexOfFirstJob, indexOfLastJob))
     }
     
-    // Chuyển sang trang tiếp theo
+    // Go to next page
     const nextPage = () => {
         if (currentPage < Math.ceil((jobs?.length || 0) / jobsPerPage)) {
             setCurrentPage(currentPage + 1)
         }
     }
     
-    // Quay lại trang trước
+    // Go back to previous page
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1)
@@ -106,7 +106,7 @@ const AdminAllJobs = () => {
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-6">Job Management</h1>
                 
-                {/* Tiêu đề và số liệu tổng quan */}
+                {/* Title and overview metrics */}
                 <div className="bg-white p-4 rounded-lg shadow border border-gray-100 mb-6">
                     <div className="flex justify-between items-center">
                         <div>
@@ -119,7 +119,7 @@ const AdminAllJobs = () => {
                     </div>
                 </div>
                 
-                {/* Ô tìm kiếm */}
+                {/* Search box */}
                 <div className="flex justify-between items-center mb-6">
                     <div className="relative w-full md:w-64">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -133,13 +133,13 @@ const AdminAllJobs = () => {
                     </div>
                 </div>
 
-                {/* Hiển thị số lượng việc làm tìm thấy */}
+                {/* Display number of jobs found */}
                 <div className="text-sm text-gray-500 mb-4">
                     Found {jobs?.length || 0} jobs
                     {search ? ` fit "${search}"` : ''}
                 </div>
 
-                {/* Bảng danh sách job */}
+                {/* Jobs list table */}
                 {loading ? (
                     <div className="flex justify-center items-center h-40">
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#007771]"></div>
@@ -184,7 +184,7 @@ const AdminAllJobs = () => {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col">
-                                                    <span>{job.created_by?.fullname || "Không xác định"}</span>
+                                                    <span>{job.created_by?.fullname || "Not specified"}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell>{formatDate(job.createdAt)}</TableCell>
@@ -205,7 +205,7 @@ const AdminAllJobs = () => {
                             </TableBody>
                         </Table>
                         
-                        {/* Thêm phân trang */}
+                        {/* Add pagination */}
                         {jobs && jobs.length > 0 && (
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-4 px-2 gap-4">
                                 <div className="flex items-center space-x-2 order-2 sm:order-1">
@@ -220,7 +220,7 @@ const AdminAllJobs = () => {
                                         Previous
                                     </Button>
                                     
-                                    {/* Hiển thị các số trang */}
+                                    {/* Display page numbers */}
                                     <div className="flex items-center space-x-1">
                                         {Array.from({ length: Math.ceil((jobs?.length || 0) / jobsPerPage) }, (_, i) => i + 1).map((pageNum) => (
                                             <Button

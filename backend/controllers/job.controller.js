@@ -41,30 +41,30 @@ export const getAllJobs = async (req, res) => {
     try {
         const { keyword, location, title, company } = req.query;
         
-        // Khởi tạo đối tượng query
+        // Initialize query object
         const query = {};
         
-        // Thêm tìm kiếm theo từ khóa nếu được cung cấp
+        // Add search by keyword if provided
         if (keyword) {
-            // Tìm kiếm chính xác hơn
-            const keywordPattern = keyword.trim(); // Loại bỏ khoảng trắng thừa
+            // More precise search
+            const keywordPattern = keyword.trim(); // Remove extra whitespace
             query.$or = [
-                { title: { $regex: `\\b${keywordPattern}\\b`, $options: "i" } }, // Chỉ tìm từ hoàn chỉnh
+                { title: { $regex: `\\b${keywordPattern}\\b`, $options: "i" } }, // Only find complete words
                 { description: { $regex: `\\b${keywordPattern}\\b`, $options: "i" } },
             ];
         }
         
-        // Thêm lọc theo vị trí nếu được cung cấp
+        // Add filter by location if provided
         if (location) {
             query.location = { $regex: location, $options: "i" };
         }
         
-        // Thêm lọc theo ngành nghề/vị trí (dùng trực tiếp trường title)
+        // Add filter by industry/position (using title field directly)
         if (title) {
             query.title = { $regex: title, $options: "i" };
         }
         
-        // Thêm lọc theo công ty nếu được cung cấp
+        // Add filter by company if provided
         if (company) {
             query.company = company;
         }
@@ -193,16 +193,16 @@ export const deleteJob = async (req, res) => {
 }
 
 /**
- * Lấy tất cả các jobs trong hệ thống (chỉ dành cho admin)
+ * Get all jobs in the system (admin only)
  */
 export const getAllJobsAdmin = async (req, res) => {
     try {
         const { search, company } = req.query;
         
-        // Xây dựng query để tìm kiếm
+        // Build search query
         let query = {};
         
-        // Tìm kiếm theo từ khóa (title hoặc description) nếu có
+        // Search by keyword (title or description) if provided
         if (search) {
             query.$or = [
                 { title: { $regex: search, $options: "i" } },
@@ -210,26 +210,26 @@ export const getAllJobsAdmin = async (req, res) => {
             ];
         }
         
-        // Tìm kiếm theo công ty nếu có
+        // Search by company if provided
         if (company) {
             query.company = company;
         }
 
-        // Thực hiện truy vấn với populate để lấy thông tin công ty và người tạo
+        // Execute query with populate to get company and creator information
         const jobs = await Job.find(query)
             .populate({
                 path: 'company',
-                select: 'name logo location' // Chỉ lấy các trường cần thiết
+                select: 'name logo location' // Only get necessary fields
             })
             .populate({
                 path: 'created_by',
-                select: 'fullname email' // Chỉ lấy các trường cần thiết
+                select: 'fullname email' // Only get necessary fields
             })
             .populate({
                 path: 'applications',
-                select: '_id' // Chỉ lấy ID để đếm số lượng
+                select: '_id' // Only get ID to count the number
             })
-            .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo, mới nhất lên trước
+            .sort({ createdAt: -1 }); // Sort by creation time, newest first
             
         return res.status(200).json({
             message: "Get jobs list successfully",
@@ -247,15 +247,15 @@ export const getAllJobsAdmin = async (req, res) => {
     }
 }
 
-// Admin lấy tất cả job trong hệ thống (với phân trang)
+// Admin gets all jobs in the system (with pagination)
 export const getAllJobsForAdmin = async (req, res) => {
     try {
         const { keyword, page = 1, limit = 10 } = req.query;
         
-        // Khởi tạo đối tượng query
+        // Initialize query object
         const query = {};
         
-        // Thêm tìm kiếm theo từ khóa nếu được cung cấp
+        // Add keyword search if provided
         if (keyword) {
             query.$or = [
                 { title: { $regex: keyword, $options: "i" } },
@@ -263,15 +263,15 @@ export const getAllJobsForAdmin = async (req, res) => {
             ];
         }
         
-        // Đếm tổng số job thỏa mãn điều kiện
+        // Count the total number of jobs matching the conditions
         const total = await Job.countDocuments(query);
         
-        // Thiết lập phân trang
+        // Set up pagination
         const pageNumber = parseInt(page);
         const pageSize = parseInt(limit);
         const skip = (pageNumber - 1) * pageSize;
         
-        // Lấy job với phân trang, sắp xếp theo ngày tạo mới nhất và populate company
+        // Get jobs with pagination, sort by newest creation date and populate company
         const jobs = await Job.find(query)
             .populate({
                 path: "company",

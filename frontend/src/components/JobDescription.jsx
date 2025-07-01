@@ -24,7 +24,7 @@ const JobDescription = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Kiểm tra vai trò của người dùng
+    // Check user role
     const isAdmin = user?.role === 'admin';
     const isRecruiter = user?.role === 'recruiter';
 
@@ -59,7 +59,7 @@ const JobDescription = () => {
         setIsCancelDialogOpen(false);
     }
     
-    // Hàm xử lý hủy đơn ứng tuyển
+    // Function to handle canceling an application
     const cancelApplicationHandler = async () => {
         try {
             setIsCancelingApplication(true);
@@ -68,9 +68,9 @@ const JobDescription = () => {
             });
             
             if (res.data.success) {
-                setIsApplied(false); // Cập nhật trạng thái đã ứng tuyển
+                setIsApplied(false); // Update application status
                 
-                // Cập nhật danh sách ứng tuyển trong singleJob
+                // Update applications list in singleJob
                 const updatedApplications = singleJob.applications.filter(
                     application => application.applicant !== user?._id
                 );
@@ -94,7 +94,7 @@ const JobDescription = () => {
             const res = await axios.delete(`${JOB_API_END_POINT}/delete/${jobId}`, { withCredentials: true });
             
             if (res.data.success) {
-                toast.success(res.data.message || 'Deleted job successfully!');     // Chuyển hướng về trang danh sách job dựa theo vai trò
+                toast.success(res.data.message || 'Deleted job successfully!');     // Redirect to job listing page based on role
                 if (isAdmin) {
                     navigate('/admin/all-jobs');
                 } else if (isRecruiter) {
@@ -116,22 +116,22 @@ const JobDescription = () => {
                 if (res.data.success) {
                     dispatch(setSingleJob(res.data.job));
                     
-                    // Kiểm tra nếu người dùng đã nộp đơn ứng tuyển công việc này
+                    // Check if the user has already applied for this job
                     setIsApplied(res.data.job.applications.some(app => app.applicant === user?._id));
                     
-                    // Nếu đã ứng tuyển, cần lấy thêm thông tin về application
+                    // If already applied, need to get additional information about the application
                     if (user?._id && res.data.job.applications.some(app => app.applicant === user?._id)) {
                         try {
-                            // Lấy danh sách các application của người dùng
+                            // Get list of user applications
                             const appRes = await axios.get(`${APPLICATION_API_END_POINT}/get`, { withCredentials: true });
                             
                             if (appRes.data.success) {
-                                // Tìm application cho job hiện tại
+                                // Find application for current job
                                 const currentJobApplication = appRes.data.application.find(
                                     app => app.job?._id === jobId
                                 );
                                 
-                                // Cập nhật trạng thái của application (pending/accepted/rejected)
+                                // Update status of application (pending/accepted/rejected)
                                 if (currentJobApplication) {
                                     setApplicationStatus(currentJobApplication.status || "pending");
                                 }
@@ -148,7 +148,7 @@ const JobDescription = () => {
         fetchSingleJob();
     }, [jobId, dispatch, user?._id]);return (
         <div className='max-w-7xl mx-auto my-10 px-24'>
-            {/* Nút Back cho Admin */}
+            {/* Back button for Admin */}
             {isAdmin && (
                 <Button 
                     variant="ghost" 
@@ -159,7 +159,7 @@ const JobDescription = () => {
                     Back
                 </Button>
             )}
-              {/* Nút Back cho Recruiter */}
+              {/* Back button for Recruiter */}
             {isRecruiter && (
                 <Button 
                     variant="ghost" 
@@ -171,7 +171,7 @@ const JobDescription = () => {
                 </Button>
             )}
             
-            {/* Nút Back cho Applicant */}
+            {/* Back button for Applicant */}
             {!isAdmin && !isRecruiter && (
                 <Button 
                     variant="ghost" 
@@ -242,7 +242,7 @@ const JobDescription = () => {
                 <h1 className='font-bold my-1'>Posted Date: <span className='pl-4 font-normal text-gray-800'>{singleJob?.createdAt ? singleJob.createdAt.split("T")[0] : "N/A"}</span></h1>
             </div>
 
-            {/* Dialog xác nhận xóa */}
+            {/* Delete confirmation dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>

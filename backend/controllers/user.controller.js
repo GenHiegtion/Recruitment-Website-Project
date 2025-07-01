@@ -18,7 +18,7 @@ export const register = async (req, res) => {
         
         let profilePhotoUrl = null;
         
-        // Kiểm tra xem có file được gửi hay không
+        // Check if any file is submitted
         if (req.file) {
             const file = req.file;
             const fileUri = getDataUri(file);
@@ -151,7 +151,7 @@ export const updateProfile = async (req, res) => {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
 
         let cloudResponse = null;
-        // Kiểm tra xem có file được gửi hay không
+        // Check if any file is submitted
         if (req.file) {
             const file = req.file;
             // cloudinary connecting
@@ -334,12 +334,12 @@ export const getSavedJobs = async (req, res) => {
     }
 }
 
-// Hàm dọn dẹp savedJobs - loại bỏ các job ID không còn tồn tại
+// Function to clean up savedJobs - remove job IDs that no longer exist
 export const cleanUpSavedJobs = async (req, res) => {
     try {
         const userId = req.id;
         
-        // Tìm user cần xử lý
+        // Find user that needs processing
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({
@@ -348,7 +348,7 @@ export const cleanUpSavedJobs = async (req, res) => {
             });
         }
         
-        // Không có savedJobs để xử lý
+        // No savedJobs to process
         if (!user.savedJobs || user.savedJobs.length === 0) {
             return res.status(200).json({
                 message: "No saved jobs to clean up",
@@ -360,7 +360,7 @@ export const cleanUpSavedJobs = async (req, res) => {
         const savedJobsBeforeCleanup = [...user.savedJobs];
         const validJobIds = [];
         
-        // Kiểm tra từng job ID xem còn tồn tại không
+        // Check if each job ID still exists
         for (const jobId of user.savedJobs) {
             const jobExists = await Job.exists({ _id: jobId });
             if (jobExists) {
@@ -368,7 +368,7 @@ export const cleanUpSavedJobs = async (req, res) => {
             }
         }
         
-        // Cập nhật lại mảng savedJobs chỉ với các ID hợp lệ
+        // Update savedJobs array with only valid IDs
         user.savedJobs = validJobIds;
         await user.save();
         
@@ -391,42 +391,42 @@ export const cleanUpSavedJobs = async (req, res) => {
 }
 
 /**
- * Lấy danh sách tất cả người dùng (chỉ applicant và recruiter)
- * Admin endpoint - chỉ dành cho quản trị viên
+ * Get list of all users (only applicant and recruiter)
+ * Admin endpoint - only for administrators
  */
 export const getAllUsers = async (req, res) => {
     try {
-        // Có thể thêm tham số query để lọc theo vai trò hoặc tìm kiếm theo tên
+        // Can add query parameters to filter by role or search by name
         const { role, search, page = 1, limit = 10 } = req.query;
         
-        // Xây dựng query để tìm kiếm
+        // Build query for searching
         let query = {
-            // Loại bỏ người dùng có vai trò admin khỏi kết quả
+            // Exclude users with admin role from results
             role: { $ne: 'admin' }
         };
         
-        // Lọc theo vai trò nếu có yêu cầu
+        // Filter by role if requested
         if (role && role !== 'all') {
             query.role = role;
         }
         
-        // Tìm kiếm theo tên nếu có
+        // Search by name if provided
         if (search) {
             query.fullname = { $regex: search, $options: "i" };
         }
         
-        // Đếm tổng số document thỏa mãn điều kiện
+        // Count total documents that match the criteria
         const total = await User.countDocuments(query);
         
-        // Tính toán skip để phân trang
+        // Calculate skip for pagination
         const pageNumber = parseInt(page);
         const pageSize = parseInt(limit);
         const skip = (pageNumber - 1) * pageSize;
         
-        // Thực hiện truy vấn lấy người dùng với phân trang
+        // Execute query to get users with pagination
         const users = await User.find(query)
-            .select("-password") // Loại bỏ trường password cho bảo mật
-            .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo, mới nhất trước
+            .select("-password") // Remove password field for security
+            .sort({ createdAt: -1 }) // Sort by creation time, newest first
             .skip(skip)
             .limit(pageSize);
         
@@ -452,34 +452,34 @@ export const getAllUsers = async (req, res) => {
 }
 
 /**
- * Lấy danh sách tất cả người dùng không phân trang
- * Admin endpoint - chỉ dành cho quản trị viên
+ * Get list of all users without pagination
+ * Admin endpoint - only for administrators
  */
 export const getAllUsersNoPage = async (req, res) => {
     try {
-        // Có thể thêm tham số query để lọc theo vai trò hoặc tìm kiếm theo tên
+        // Can add query parameters to filter by role or search by name
         const { role, search } = req.query;
         
-        // Xây dựng query để tìm kiếm
+        // Build query for searching
         let query = {
-            // Loại bỏ người dùng có vai trò admin khỏi kết quả
+            // Exclude users with admin role from results
             role: { $ne: 'admin' }
         };
         
-        // Lọc theo vai trò nếu có yêu cầu
+        // Filter by role if requested
         if (role && role !== 'all') {
             query.role = role;
         }
         
-        // Tìm kiếm theo tên nếu có
+        // Search by name if provided
         if (search) {
             query.fullname = { $regex: search, $options: "i" };
         }
         
-        // Lấy tất cả người dùng không phân trang
+        // Get all users without pagination
         const users = await User.find(query)
-            .select("-password") // Loại bỏ trường password cho bảo mật
-            .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo, mới nhất trước
+            .select("-password") // Remove password field for security
+            .sort({ createdAt: -1 }); // Sort by creation time, newest first
         
         return res.status(200).json({
             message: "Successfully get all users",
@@ -497,15 +497,15 @@ export const getAllUsersNoPage = async (req, res) => {
 }
 
 /**
- * Tạo tài khoản admin mới
- * API này được bảo vệ bằng một secret key
+ * Create a new admin account
+ * This API is protected with a secret key
  */
 export const createAdmin = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, password, secretKey } = req.body;
         
-        // Kiểm tra secret key để tạo admin
-        // Sử dụng giá trị từ biến môi trường hoặc một giá trị mặc định nếu không có
+        // Check secret key to create admin
+        // Use value from environment variable or a default value if not available
         const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY || "recruitment_system_admin_secret2025";
         
         if (!secretKey || secretKey !== ADMIN_SECRET_KEY) {
@@ -522,7 +522,7 @@ export const createAdmin = async (req, res) => {
             });
         }
         
-        // Kiểm tra email đã tồn tại chưa
+        // Check if email already exists
         const user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({
@@ -531,10 +531,10 @@ export const createAdmin = async (req, res) => {
             });
         }
         
-        // Mã hóa mật khẩu
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Tạo tài khoản admin mới
+        // Create new admin account
         await User.create({
             fullname,
             email,
@@ -561,14 +561,14 @@ export const createAdmin = async (req, res) => {
 }
 
 /**
- * Xóa người dùng và tất cả dữ liệu liên quan
- * Admin endpoint - chỉ dành cho quản trị viên
+ * Delete a user and all related data
+ * Admin endpoint - only for administrators
  */
 export const deleteUser = async (req, res) => {
     try {
         const userId = req.params.id;
         
-        // Tìm user cần xóa
+        // Find the user to delete
         const userToDelete = await User.findById(userId);
         if (!userToDelete) {
             return res.status(404).json({
@@ -577,7 +577,7 @@ export const deleteUser = async (req, res) => {
             });
         }
         
-        // Không cho phép xóa tài khoản admin
+        // Do not allow deleting admin accounts
         if (userToDelete.role === 'admin') {
             return res.status(403).json({
                 message: "Cannot delete admin accounts",
@@ -585,49 +585,49 @@ export const deleteUser = async (req, res) => {
             });
         }
         
-        // Thống kê dữ liệu đã xóa để trả về
+        // Statistics of deleted data to return
         const deletedData = {
             companies: 0,
             jobs: 0,
             applications: 0
         };
 
-        // Import các model cần thiết
+        // Import necessary models
         const { Company } = await import("../models/company.model.js");
         const { Job } = await import("../models/job.model.js");
         const { Application } = await import("../models/application.model.js");
         
-        // Xử lý dựa trên vai trò của user
+        // Process based on user role
         if (userToDelete.role === 'recruiter') {
-            // 1. Tìm tất cả công ty được tạo bởi recruiter này
+            // 1. Find all companies created by this recruiter
             const companies = await Company.find({ userId: userId });
             deletedData.companies = companies.length;
             
-            // 2. Tìm và xóa tất cả job thuộc các công ty này
+            // 2. Find and delete all jobs belonging to these companies
             for (const company of companies) {
                 const jobs = await Job.find({ company: company._id });
                 deletedData.jobs += jobs.length;
                 
-                // 3. Xóa tất cả application cho các job này
+                // 3. Delete all applications for these jobs
                 for (const job of jobs) {
                     const applications = await Application.deleteMany({ job: job._id });
                     deletedData.applications += applications.deletedCount;
                 }
                 
-                // 4. Xóa tất cả job của công ty
+                // 4. Delete all jobs of the company
                 await Job.deleteMany({ company: company._id });
             }
             
-            // 5. Xóa tất cả công ty của recruiter
+            // 5. Delete all companies of this recruiter
             await Company.deleteMany({ userId: userId });
             
         } else if (userToDelete.role === 'applicant') {
-            // 1. Tìm và xóa tất cả application của applicant
+            // 1. Find and delete all applications of this applicant
             const applications = await Application.deleteMany({ applicant: userId });
             deletedData.applications = applications.deletedCount;
         }
         
-        // Xóa user
+        // Delete the user
         await User.findByIdAndDelete(userId);
         
         return res.status(200).json({
@@ -646,35 +646,35 @@ export const deleteUser = async (req, res) => {
 }
 
 /**
- * Lấy danh sách tất cả người dùng có vai trò applicant
- * Admin endpoint - chỉ dành cho quản trị viên
+ * Get list of all users with applicant role
+ * Admin endpoint - only for administrators
  */
 export const getAllApplicants = async (req, res) => {
     try {
         const { search, page = 1, limit = 10 } = req.query;
         
-        // Xây dựng query để tìm kiếm applicant
+        // Build query to search for applicants
         let query = {
-            role: 'applicant' // Chỉ lấy người dùng có vai trò applicant
+            role: 'applicant' // Only get users with applicant role
         };
         
-        // Tìm kiếm theo tên nếu có
+        // Search by name if provided
         if (search) {
             query.fullname = { $regex: search, $options: "i" };
         }
         
-        // Đếm tổng số applicant thỏa mãn điều kiện
+        // Count total applicants that match the criteria
         const total = await User.countDocuments(query);
         
-        // Tính toán skip để phân trang
+        // Calculate skip for pagination
         const pageNumber = parseInt(page);
         const pageSize = parseInt(limit);
         const skip = (pageNumber - 1) * pageSize;
         
-        // Thực hiện truy vấn lấy danh sách applicant với phân trang
+        // Execute query to get list of applicants with pagination
         const applicants = await User.find(query)
-            .select("-password") // Loại bỏ trường password cho bảo mật
-            .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo, mới nhất trước
+            .select("-password") // Remove password field for security
+            .sort({ createdAt: -1 }) // Sort by creation time, newest first
             .skip(skip)
             .limit(pageSize);
         
@@ -700,35 +700,35 @@ export const getAllApplicants = async (req, res) => {
 }
 
 /**
- * Lấy danh sách tất cả người dùng có vai trò recruiter
- * Admin endpoint - chỉ dành cho quản trị viên
+ * Get list of all users with recruiter role
+ * Admin endpoint - only for administrators
  */
 export const getAllRecruiters = async (req, res) => {
     try {
         const { search, page = 1, limit = 10 } = req.query;
         
-        // Xây dựng query để tìm kiếm recruiter
+        // Build query to search for recruiters
         let query = {
-            role: 'recruiter' // Chỉ lấy người dùng có vai trò recruiter
+            role: 'recruiter' // Only get users with recruiter role
         };
         
-        // Tìm kiếm theo tên nếu có
+        // Search by name if provided
         if (search) {
             query.fullname = { $regex: search, $options: "i" };
         }
         
-        // Đếm tổng số recruiter thỏa mãn điều kiện
+        // Count total recruiters that match the criteria
         const total = await User.countDocuments(query);
         
-        // Tính toán skip để phân trang
+        // Calculate skip value for pagination
         const pageNumber = parseInt(page);
         const pageSize = parseInt(limit);
         const skip = (pageNumber - 1) * pageSize;
         
-        // Thực hiện truy vấn lấy danh sách recruiter với phân trang
+        // Execute query to get list of recruiters with pagination
         const recruiters = await User.find(query)
-            .select("-password") // Loại bỏ trường password cho bảo mật
-            .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo, mới nhất trước
+            .select("-password") // Remove password field for security
+            .sort({ createdAt: -1 }) // Sort by creation time, newest first
             .skip(skip)
             .limit(pageSize);
         

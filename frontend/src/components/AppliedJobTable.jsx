@@ -95,7 +95,7 @@ const AppliedJobTable = () => {
                 </TableBody>
             </Table>
             
-            {/* Dialog xác nhận hủy đơn ứng tuyển */}
+            {/* Application cancellation confirmation dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>

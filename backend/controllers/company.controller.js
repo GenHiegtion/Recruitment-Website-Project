@@ -77,7 +77,7 @@ export const updateCompany = async (req, res) => {
     try {
         const { name, description, website, location } = req.body;
         
-        // Khởi tạo object updateData với thông tin cơ bản
+        // Initialize updateData object with basic information
         const updateData = { 
             name, 
             description, 
@@ -85,7 +85,7 @@ export const updateCompany = async (req, res) => {
             location 
         };
 
-        // Chỉ xử lý file khi có file được gửi lên
+        // Only process file when one is uploaded
         if (req.file) {
             const file = req.file;
             // cloudinary connecting
@@ -105,7 +105,7 @@ export const updateCompany = async (req, res) => {
         
         return res.status(200).json({
             message: "Company information updated.",
-            company, // Thêm company vào response để frontend dễ dàng cập nhật UI
+            company, // Add company to the response so frontend can easily update UI
             success: true
         });
     } catch (error) {
@@ -119,25 +119,25 @@ export const updateCompany = async (req, res) => {
 }
 
 /**
- * Lấy tất cả công ty trong hệ thống
- * Admin endpoint - chỉ dành cho quản trị viên
+ * Get all companies in the system
+ * Admin endpoint - only for administrators
  */
 export const getAllCompanies = async (req, res) => {
     try {
         const { search } = req.query;
         
-        // Xây dựng query để tìm kiếm
+        // Build query for searching
         let query = {};
         
-        // Tìm kiếm theo tên nếu có
+        // Search by name if provided
         if (search) {
             query.name = { $regex: search, $options: "i" };
         }
         
-        // Thực hiện truy vấn lấy tất cả công ty
+        // Execute query to get all companies
         const companies = await Company.find(query)
-            .populate('userId', 'fullname email') // Lấy thông tin người dùng đã tạo công ty
-            .sort({ createdAt: -1 }); // Sắp xếp theo thời gian tạo, mới nhất trước
+            .populate('userId', 'fullname email') // Get user information who created the company
+            .sort({ createdAt: -1 }); // Sort by creation time, newest first
         
         return res.status(200).json({
             message: "Get companies list successfully",
@@ -156,15 +156,15 @@ export const getAllCompanies = async (req, res) => {
 }
 
 /**
- * Xóa công ty và tất cả công việc liên quan
- * Admin endpoint - chỉ dành cho quản trị viên
+ * Delete company and all related jobs
+ * Admin endpoint - only for administrators
  */
 export const deleteCompany = async (req, res) => {    try {
         const companyId = req.params.id;
-        const userId = req.id; // Lấy ID của người dùng đang đăng nhập
-        const userRole = req.userRole; // Lấy vai trò của người dùng
+        const userId = req.id; // Get ID of currently logged in user
+        const userRole = req.userRole; // Get user's role
         
-        // Tìm công ty cần xóa
+        // Find the company to delete
         const company = await Company.findById(companyId);
         if (!company) {
             return res.status(404).json({
@@ -173,7 +173,7 @@ export const deleteCompany = async (req, res) => {    try {
             });
         }
         
-        // Nếu là recruiter, kiểm tra xem họ có phải là người tạo công ty không
+        // If recruiter, check if they are the creator of the company
         if (userRole === 'recruiter' && company.userId.toString() !== userId) {
             return res.status(403).json({
                 message: "You can only delete companies that you created",
@@ -181,10 +181,10 @@ export const deleteCompany = async (req, res) => {    try {
             });
         }
         
-        // Xóa tất cả công việc liên quan đến công ty này
+        // Delete all jobs related to this company
         const deletedJobs = await Job.deleteMany({ company: companyId });
         
-        // Xóa công ty
+        // Delete the company
         await Company.findByIdAndDelete(companyId);
         
         return res.status(200).json({

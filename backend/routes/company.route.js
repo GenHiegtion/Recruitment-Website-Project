@@ -6,15 +6,15 @@ import { singleUpload } from "../middlewares/multer.js";
 
 const router = express.Router();
 
-// Admin route - Lấy tất cả công ty trong hệ thống
+// Admin route - Get all companies in the system
 router.route("/all").get(isAuthenticated, checkRole(['admin']), getAllCompanies);
-// Cho phép cả admin và recruiter xóa công ty
+// Allow both admin and recruiter to delete companies
 router.route("/delete/:id").delete(isAuthenticated, checkRole(['admin', 'recruiter']), deleteCompany);
 
-// Giới hạn chỉ recruiter mới được đăng ký và quản lý công ty
+// Restrict only recruiter to register and manage companies
 router.route("/register").post(isAuthenticated, checkRole(['recruiter']), registerCompany);
 router.route("/get").get(isAuthenticated, checkRole(['recruiter']), getCompany);
-// Cho phép cả admin và recruiter xem chi tiết công ty
+// Allow both admin and recruiter to view company details
 router.route("/get/:id").get(isAuthenticated, checkRole(['recruiter', 'admin']), getCompanyById);
 router.route("/update/:id").put(isAuthenticated, checkRole(['recruiter']), singleUpload, updateCompany);
 

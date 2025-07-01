@@ -35,7 +35,7 @@ export const applyJob = async (req, res) => {
         });
 
         job.applications.push(newApplication._id);
-        // Tăng số lượng ứng tuyển mới
+        // Increase new applications count
         job.newApplicationsCount = (job.newApplicationsCount || 0) + 1;
         await job.save();
         return res.status(201).json({
@@ -121,9 +121,9 @@ export const updateStatus = async (req, res) => {
         application.status = status.toLowerCase();
         await application.save();
 
-        // Giảm số lượng ứng tuyển mới khi trạng thái được cập nhật thành accepted hoặc rejected
+        // Decrease new applications count when status is updated to accepted or rejected
         if (status.toLowerCase() === 'accepted' || status.toLowerCase() === 'rejected') {
-            // Tìm job liên quan đến application này
+            // Find job related to this application
             const job = await Job.findById(application.job);
             if (job && job.newApplicationsCount > 0) {
                 job.newApplicationsCount -= 1;
@@ -142,8 +142,8 @@ export const updateStatus = async (req, res) => {
 }
 
 /**
- * Cho phép applicant hủy đơn ứng tuyển
- * Xóa application và cập nhật lại job
+ * Allow applicant to cancel their job application
+ * Delete the application and update the job
  */
 export const cancelApplication = async (req, res) => {
     try {
@@ -157,7 +157,7 @@ export const cancelApplication = async (req, res) => {
             });
         }
         
-        // Tìm job
+        // Find the job
         const job = await Job.findById(jobId);
         if (!job) {
             return res.status(404).json({
@@ -165,7 +165,7 @@ export const cancelApplication = async (req, res) => {
                 success: false
             });
         }
-          // Tìm application cần xóa
+          // Find the application to delete
         const application = await Application.findOne({ job: jobId, applicant: userId });
         if (!application) {
             return res.status(404).json({
@@ -174,26 +174,26 @@ export const cancelApplication = async (req, res) => {
             });
         }
         
-        // Kiểm tra trạng thái application
+        // Check application status
         if (application.status === "accepted" || application.status === "rejected") {
             return res.status(400).json({
                 message: "Cannot cancel application that has already been accepted or rejected",
                 success: false
             });
         }        
-        // Xóa application id khỏi mảng applications của job
+        // Remove application id from the job's applications array
         job.applications = job.applications.filter(
             app => app.toString() !== application._id.toString()
         );
         
-        // Nếu đơn đang ở trạng thái pending (chưa được xử lý), giảm số ứng tuyển mới
+        // If the application is in pending status (not yet processed), reduce new application count
         if (application.status === "pending" && job.newApplicationsCount > 0) {
             job.newApplicationsCount -= 1;
         }
         
         await job.save();
         
-        // Xóa application
+        // Delete application
         await Application.findByIdAndDelete(application._id);
         
         return res.status(200).json({

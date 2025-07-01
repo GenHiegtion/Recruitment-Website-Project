@@ -15,22 +15,22 @@ router.route("/job/:id/unsave").post(isAuthenticated, unsaveJob);
 router.route("/saved-jobs").get(isAuthenticated, getSavedJobs);
 router.route("/cleanup-saved-jobs").post(isAuthenticated, cleanUpSavedJobs);
 
-// API lấy tất cả user với phân trang - chỉ cho phép admin truy cập
+// API to get all users with pagination - only allows admin access
 router.route("/all").get(isAuthenticated, checkRole(['admin']), getAllUsers);
 
-// API lấy tất cả user không phân trang - chỉ cho phép admin truy cập
+// API to get all users without pagination - only allows admin access
 router.route("/all-no-page").get(isAuthenticated, checkRole(['admin']), getAllUsersNoPage);
 
-// API lấy tất cả applicant với phân trang - chỉ cho phép admin truy cập
+// API to get all applicants with pagination - only allows admin access
 router.route("/applicants").get(isAuthenticated, checkRole(['admin']), getAllApplicants);
 
-// API lấy tất cả recruiter với phân trang - chỉ cho phép admin truy cập
+// API to get all recruiters with pagination - only allows admin access
 router.route("/recruiters").get(isAuthenticated, checkRole(['admin']), getAllRecruiters);
 
-// API để tạo tài khoản admin (được bảo vệ bằng secret key)
+// API to create admin account (protected by secret key)
 router.route("/create-admin").post(createAdmin);
 
-// API xóa user và tất cả dữ liệu liên quan - chỉ cho phép admin truy cập
+// API to delete user and all related data - only allows admin access
 router.route("/delete/:id").delete(isAuthenticated, checkRole(['admin']), deleteUser);
 
 export default router;
