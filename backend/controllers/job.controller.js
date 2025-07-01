@@ -1,6 +1,6 @@
 import { Job } from "../models/job.model.js";
 
-// admins post job
+// recruiter posts job
 export const postJob = async (req, res) => {
     try {
         const { title, description, requirements, salary, location,
@@ -106,7 +106,7 @@ export const getJobById = async (req, res) => {
     }
 }
 
-// how many jobs posted by admin
+// how many jobs posted by recruiter
 export const getAdminJobs = async (req, res) => {
     try {
         const adminId = req.id;
